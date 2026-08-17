@@ -982,6 +982,47 @@ button:hover{
   max-height:1px !important;
 }
 
+
+/* RESTORE PRIORITY COLOURS IN CONTEXT MENU */
+#taskContextMenu .priorityChoice{
+  position:relative !important;
+  display:block !important;
+  width:100% !important;
+  height:20px !important;
+  min-height:20px !important;
+  padding:0 !important;
+  border:1px solid var(--line) !important;
+  border-radius:5px !important;
+}
+
+#taskContextMenu .priorityChoice::after{
+  content:"";
+  position:absolute !important;
+  width:8px;
+  height:8px;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  background:var(--priority-none);
+}
+
+#taskContextMenu .priorityChoice[data-priority="high"]::after{
+  background:var(--priority-high);
+}
+
+#taskContextMenu .priorityChoice[data-priority="medium"]::after{
+  background:var(--priority-medium);
+}
+
+#taskContextMenu .priorityChoice[data-priority="low"]::after{
+  background:var(--priority-low);
+}
+
+#taskContextMenu .priorityChoice[data-priority="none"]::after{
+  background:var(--priority-none);
+}
+
 </style>
 </head>
 
