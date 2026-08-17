@@ -122,7 +122,13 @@ function saveModal(){data[editingKey].notes=document.getElementById("modalNotes"
 function closeModal(){document.getElementById("overlay").style.display="none"}
 function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="my-diary-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
 function importData(ev){let f=ev.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let parsed=JSON.parse(r.result);if(typeof parsed!=="object"||Array.isArray(parsed))throw 0;data=parsed;save();render();alert("Diary backup imported.");}catch(e){alert("That file doesn't look like a valid diary backup.");}};r.readAsText(f);ev.target.value=""}
-if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js"));
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js", {
+      updateViaCache: "none"
+    });
+  });
+}
 render();
 </script>
 </body>
