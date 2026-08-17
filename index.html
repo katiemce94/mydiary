@@ -629,7 +629,8 @@ button:hover{
   display:none;
   position:fixed;
   z-index:100;
-  min-width:205px;
+  width:220px;
+  max-width:calc(100vw - 20px);
   background:var(--paper);
   border:1px solid var(--line);
   border-radius:10px;
@@ -2297,8 +2298,11 @@ function renderGeneralTodos(){
     const priority =
       row.children[3];
 
-    const del =
+    const calendarButton =
       row.children[4];
+
+    const del =
+      row.children[5];
 
 
     tx.value =
@@ -2348,6 +2352,16 @@ function renderGeneralTodos(){
       };
 
 
+    calendarButton.onclick =
+      () => {
+
+        openGeneralCalendarPicker(
+          task
+        );
+
+      };
+
+
     del.onclick =
       () => {
 
@@ -2362,6 +2376,65 @@ function renderGeneralTodos(){
         renderGeneralTodos();
 
       };
+
+
+    attachContextMenu(
+      row,
+      {
+        type:"general",
+
+        isDone:
+          () => task.done,
+
+        toggleComplete:
+          () => {
+
+            task.done =
+              !task.done;
+
+            saveGeneralTodos();
+
+            renderGeneralTodos();
+
+          },
+
+        addToCalendar:
+          () => {
+
+            openGeneralCalendarPicker(
+              task
+            );
+
+          },
+
+        setPriority:
+          value => {
+
+            task.priority =
+              value;
+
+            saveGeneralTodos();
+
+            renderGeneralTodos();
+
+          },
+
+        deleteTask:
+          () => {
+
+            generalTodos =
+              generalTodos.filter(
+                item =>
+                  item.id !== task.id
+              );
+
+            saveGeneralTodos();
+
+            renderGeneralTodos();
+
+          }
+      }
+    );
 
 
     requestAnimationFrame(
