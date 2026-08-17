@@ -916,6 +916,72 @@ button:hover{
     justify-self:start;
   }
 }
+
+/* FINAL COMPACT CONTEXT MENU OVERRIDE */
+#taskContextMenu{
+  display:none;
+  position:fixed;
+  width:190px !important;
+  min-width:190px !important;
+  max-width:190px !important;
+  height:max-content !important;
+  min-height:unset !important;
+  max-height:max-content !important;
+  padding:5px !important;
+  margin:0 !important;
+  overflow:hidden !important;
+  align-self:auto !important;
+  justify-self:auto !important;
+  flex:none !important;
+  grid-auto-rows:max-content !important;
+}
+
+#taskContextMenu.open{
+  display:inline-block !important;
+  height:max-content !important;
+  min-height:0 !important;
+  max-height:max-content !important;
+}
+
+#taskContextMenu #contextMenuActions{
+  display:block !important;
+  position:static !important;
+  width:100% !important;
+  height:max-content !important;
+  min-height:0 !important;
+  max-height:max-content !important;
+  padding:0 !important;
+  margin:0 !important;
+  overflow:hidden !important;
+}
+
+#taskContextMenu .contextMenuTitle,
+#taskContextMenu button,
+#taskContextMenu .contextDivider,
+#taskContextMenu .contextPriorityRow{
+  position:static !important;
+  float:none !important;
+  flex:none !important;
+}
+
+#taskContextMenu .contextMenuTitle{
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+}
+
+#taskContextMenu button{
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+}
+
+#taskContextMenu .contextDivider{
+  height:1px !important;
+  min-height:1px !important;
+  max-height:1px !important;
+}
+
 </style>
 </head>
 
@@ -1303,6 +1369,10 @@ function positionTaskContextMenu(x, y){
     document.getElementById(
       "taskContextMenu"
     );
+
+  menu.style.height = "auto";
+  menu.style.minHeight = "0";
+  menu.style.maxHeight = "none";
 
   menu.classList.add(
     "open"
