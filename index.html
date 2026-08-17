@@ -1379,12 +1379,35 @@ function switchTab(tab){
       : "hidden";
 
 
-  if(!diaryActive){
+  if(diaryActive){
+
+    /*
+      Whenever you return to Diary, reset to the current month
+      and render again. render() already scrolls to today's card.
+    */
+
+    const today =
+      new Date();
+
+    view =
+      new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        1
+      );
+
+    render();
+
+  }
+  else{
+
     renderGeneralTodos();
+
     window.scrollTo({
       top:0,
       behavior:"smooth"
     });
+
   }
 
 }
