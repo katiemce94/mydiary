@@ -95,8 +95,13 @@ function render(){
  document.getElementById("monthTitle").textContent=monthNames[view.getMonth()]+" "+view.getFullYear();
  const grid=document.getElementById("grid");grid.innerHTML="";
  let y=view.getFullYear(),m=view.getMonth(),count=new Date(y,m+1,0).getDate();
- for(let n=1;n<=count;n++){
-  let d=new Date(y,m,n),e=entry(d),card=document.createElement("section");card.className="card";
+for(let n=1;n<=count;n++){
+  let d=new Date(y,m,n);
+
+  // Work diary — hide Saturday and Sunday
+  if(d.getDay() === 0 || d.getDay() === 6) continue;
+
+  let e=entry(d),card=document.createElement("section");card.className="card";
   card.innerHTML=`<div class="dayhead"><div class="day">${dayNames[d.getDay()]}</div><div class="date">${String(n).padStart(2,"0")} ${monthNames[m]}</div></div><div class="tasks"></div><button class="add">+ add another</button><button class="open" title="Open daily notes">↗</button>`;
   let tasks=card.querySelector(".tasks");
   e.tasks.forEach((t,i)=>{let row=document.createElement("div");row.className="task";row.innerHTML=`<input type="checkbox" ${e.done[i]?"checked":""}><input type="text" value="${esc(t)}" placeholder="To do...">`;let cb=row.children[0],tx=row.children[1];cb.onchange=()=>{e.done[i]=cb.checked;save()};tx.oninput=()=>{e.tasks[i]=tx.value;save()};tasks.appendChild(row)});
