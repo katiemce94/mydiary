@@ -16,19 +16,26 @@
 
 :root{
   --paper:#faf8f2;
+  --paper-alt-1:#f6f4ed;
+  --paper-alt-2:#f1f4ed;
   --ink:#514d46;
   --muted:#9a9388;
   --line:#ded8cc;
   --sage:#aeb7a5;
+  --page-bg:#e7e2d9;
 }
 
 *{
   box-sizing:border-box;
 }
 
+html{
+  scroll-behavior:smooth;
+}
+
 body{
   margin:0;
-  background:#e7e2d9;
+  background:var(--page-bg);
   color:var(--ink);
   font-family:"DM Sans",sans-serif;
 }
@@ -40,24 +47,21 @@ textarea{
 }
 
 .app{
-  max-width:1180px;
+  max-width:1400px;
   margin:auto;
   padding:28px;
 }
 
-
-/* STICKY TOP HEADER */
+/* FROZEN TOP HEADER */
 
 .topbar{
   display:flex;
   justify-content:space-between;
   align-items:center;
-
   position:sticky;
   top:0;
-  z-index:20;
-
-  background:#e7e2d9;
+  z-index:30;
+  background:var(--page-bg);
   padding:14px 0;
   margin-bottom:10px;
 }
@@ -87,60 +91,116 @@ button:hover{
   background:white;
 }
 
+/* BACKUP BAR */
 
-/* STICKY MONTH TITLE */
+.settings{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  flex-wrap:wrap;
+  margin-bottom:12px;
+}
+
+.settings span{
+  font-size:12px;
+  color:var(--muted);
+}
+
+#importFile{
+  display:none;
+}
+
+/* FROZEN MONTH TITLE */
 
 .monthTitle{
   text-align:center;
   font-family:"Cormorant Garamond",serif;
   font-size:30px;
-
   position:sticky;
   top:82px;
-  z-index:19;
-
-  background:#e7e2d9;
-
-  margin:0 0 22px;
-  padding:8px 0 12px;
+  z-index:29;
+  background:var(--page-bg);
+  margin:0;
+  padding:8px 0 10px;
 }
 
+/* MONDAY-FRIDAY COLUMN HEADINGS */
 
-/* DIARY GRID */
+.weekdays{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(190px,1fr));
+  gap:14px;
+  min-width:1000px;
+  padding:8px 0 10px;
+  background:var(--page-bg);
+}
+
+.weekday{
+  text-align:center;
+  font-family:"Cormorant Garamond",serif;
+  font-size:19px;
+  font-style:italic;
+  color:var(--muted);
+}
+
+/* HORIZONTAL SCROLL ON SMALLER WINDOWS */
+
+.plannerScroll{
+  overflow-x:auto;
+  overflow-y:visible;
+  padding-bottom:6px;
+}
+
+/* FIVE-DAY WORK WEEK GRID */
 
 .grid{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:repeat(5,minmax(190px,1fr));
+  grid-auto-rows:minmax(250px,auto);
   gap:14px;
+  min-width:1000px;
 }
 
 .card{
   background:var(--paper);
   border:1px solid var(--line);
   padding:18px;
-  min-height:235px;
+  min-height:250px;
   position:relative;
   box-shadow:0 2px 8px #00000008;
-
-  scroll-margin-top:145px;
+  scroll-margin-top:155px;
 }
 
-.card:nth-child(3n){
-  background:#f6f4ed;
+.card.alt1{
+  background:var(--paper-alt-1);
 }
 
-.card:nth-child(4n){
-  background:#f1f4ed;
+.card.alt2{
+  background:var(--paper-alt-2);
 }
 
-
-/* TODAY HIGHLIGHT */
+/* TODAY */
 
 .today{
   border:2px solid var(--sage);
-  box-shadow:0 4px 16px #00000010;
+  box-shadow:0 5px 18px #00000012;
 }
 
+.today::before{
+  content:"today";
+  position:absolute;
+  top:-10px;
+  left:14px;
+  background:var(--sage);
+  color:white;
+  font-size:9px;
+  letter-spacing:1.2px;
+  text-transform:uppercase;
+  padding:3px 7px;
+  border-radius:10px;
+}
+
+/* DAY CARDS */
 
 .dayhead{
   display:flex;
@@ -212,6 +272,7 @@ button:hover{
   background:transparent;
   outline:0;
   width:100%;
+  min-width:0;
   padding:3px 0;
   color:var(--ink);
 }
@@ -223,6 +284,7 @@ button:hover{
   color:var(--muted);
   cursor:pointer;
   font-size:12px;
+  padding-left:0;
 }
 
 .open{
@@ -243,8 +305,7 @@ button:hover{
   margin:20px;
 }
 
-
-/* DAILY NOTES */
+/* DAILY NOTES OVERLAY */
 
 .overlay{
   display:none;
@@ -253,7 +314,7 @@ button:hover{
   background:#514d4638;
   backdrop-filter:blur(3px);
   padding:30px;
-  z-index:30;
+  z-index:50;
   overflow:auto;
 }
 
@@ -296,14 +357,12 @@ button:hover{
   border:0;
   outline:0;
   resize:vertical;
-
   background:repeating-linear-gradient(
     to bottom,
     transparent 0,
     transparent 30px,
     #e4dfd5 31px
   );
-
   line-height:31px;
   color:var(--ink);
 }
@@ -315,46 +374,11 @@ button:hover{
   margin-top:15px;
 }
 
-.settings{
-  display:flex;
-  gap:8px;
-  align-items:center;
-  flex-wrap:wrap;
-  margin-bottom:18px;
-}
+/* SMALLER SCREENS */
 
-.settings span{
-  font-size:12px;
-  color:var(--muted);
-}
-
-#importFile{
-  display:none;
-}
-
-
-/* RESPONSIVE */
-
-@media(max-width:800px){
-
-  .grid{
-    grid-template-columns:1fr 1fr;
-  }
-
+@media(max-width:700px){
   .app{
     padding:15px;
-  }
-
-}
-
-@media(max-width:560px){
-
-  .grid{
-    grid-template-columns:1fr;
-  }
-
-  .topbar{
-    align-items:flex-start;
   }
 
   .brand{
@@ -362,50 +386,33 @@ button:hover{
   }
 
   .monthTitle{
+    top:75px;
     font-size:26px;
-    top:76px;
   }
 
+  .card{
+    scroll-margin-top:145px;
+  }
 }
 </style>
-
 </head>
 
 <body>
 
-
 <div class="app">
 
   <div class="topbar">
-
-    <div class="brand">
-      my diary ✦
-    </div>
+    <div class="brand">my diary ✦</div>
 
     <div class="nav">
-
-      <button onclick="changeMonth(-1)">
-        ‹
-      </button>
-
-      <button onclick="goToday()">
-        Today
-      </button>
-
-      <button onclick="changeMonth(1)">
-        ›
-      </button>
-
+      <button onclick="changeMonth(-1)" aria-label="Previous month">‹</button>
+      <button onclick="goToday()">Today</button>
+      <button onclick="changeMonth(1)" aria-label="Next month">›</button>
     </div>
-
   </div>
 
-
   <div class="settings">
-
-    <button onclick="exportData()">
-      Export backup
-    </button>
+    <button onclick="exportData()">Export backup</button>
 
     <button onclick="document.getElementById('importFile').click()">
       Import backup
@@ -418,24 +425,24 @@ button:hover{
       onchange="importData(event)"
     >
 
-    <span>
-      Saved automatically on this device.
-    </span>
-
+    <span>Saved automatically on this device.</span>
   </div>
 
+  <div class="monthTitle" id="monthTitle"></div>
 
-  <div
-    class="monthTitle"
-    id="monthTitle">
+  <div class="plannerScroll" id="plannerScroll">
+
+    <div class="weekdays">
+      <div class="weekday">Monday</div>
+      <div class="weekday">Tuesday</div>
+      <div class="weekday">Wednesday</div>
+      <div class="weekday">Thursday</div>
+      <div class="weekday">Friday</div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+
   </div>
-
-
-  <div
-    class="grid"
-    id="grid">
-  </div>
-
 
   <div class="footer">
     one day at a time · ✦
@@ -444,40 +451,32 @@ button:hover{
 </div>
 
 
-
-<div
-  class="overlay"
-  id="overlay">
+<div class="overlay" id="overlay">
 
   <div class="modal">
 
     <button
       class="close"
-      onclick="closeModal()">
+      onclick="closeModal()"
+      aria-label="Close"
+    >
       ×
     </button>
 
     <h2 id="modalDay"></h2>
 
-    <div
-      class="date"
-      id="modalDate">
-    </div>
+    <div class="date" id="modalDate"></div>
 
     <div id="modalTasks"></div>
 
     <textarea
       class="notes"
       id="modalNotes"
-      placeholder="Notes, thoughts, reminders...">
-    </textarea>
+      placeholder="Notes, thoughts, reminders..."
+    ></textarea>
 
     <div class="toolbar">
-
-      <button onclick="saveModal()">
-        Save
-      </button>
-
+      <button onclick="saveModal()">Save</button>
     </div>
 
   </div>
@@ -485,22 +484,16 @@ button:hover{
 </div>
 
 
-
 <script>
 
-
 const KEY = "aestheticDiaryV2";
-
 
 let data =
   JSON.parse(
     localStorage.getItem(KEY) || "{}"
   );
 
-
-const now =
-  new Date();
-
+const now = new Date();
 
 let view =
   new Date(
@@ -509,10 +502,7 @@ let view =
     1
   );
 
-
-let editingKey =
-  null;
-
+let editingKey = null;
 
 
 const monthNames = [
@@ -530,7 +520,6 @@ const monthNames = [
   "December"
 ];
 
-
 const dayNames = [
   "Sunday",
   "Monday",
@@ -540,7 +529,6 @@ const dayNames = [
   "Friday",
   "Saturday"
 ];
-
 
 
 function key(d){
@@ -554,7 +542,6 @@ function key(d){
 }
 
 
-
 function save(){
 
   localStorage.setItem(
@@ -565,36 +552,16 @@ function save(){
 }
 
 
-
 function entry(d){
 
-  const k =
-    key(d);
+  const k = key(d);
 
   if(!data[k]){
 
     data[k] = {
-
-      tasks:[
-        "",
-        "",
-        "",
-        "",
-        "",
-        ""
-      ],
-
-      done:[
-        false,
-        false,
-        false,
-        false,
-        false,
-        false
-      ],
-
+      tasks:["","","","","",""],
+      done:[false,false,false,false,false,false],
       notes:""
-
     };
 
   }
@@ -604,56 +571,40 @@ function entry(d){
 }
 
 
-
 function esc(s){
 
   return String(s)
-
     .replace(/&/g,"&amp;")
-
     .replace(/"/g,"&quot;")
-
     .replace(/</g,"&lt;")
-
     .replace(/>/g,"&gt;");
 
 }
 
 
-
-/* BUILD CURRENT MONTH */
+/* BUILD THE CURRENT MONTH */
 
 function render(){
-
 
   document
     .getElementById("monthTitle")
     .textContent =
-
       monthNames[view.getMonth()]
-      +
-      " "
-      +
-      view.getFullYear();
-
+      + " "
+      + view.getFullYear();
 
 
   const grid =
     document.getElementById("grid");
 
-
-  grid.innerHTML =
-    "";
-
+  grid.innerHTML = "";
 
 
   const y =
     view.getFullYear();
 
-
   const m =
     view.getMonth();
-
 
   const count =
     new Date(
@@ -663,13 +614,32 @@ function render(){
     ).getDate();
 
 
+  /*
+    Work-week row tracking.
+
+    This means:
+    Monday    = column 1
+    Tuesday   = column 2
+    Wednesday = column 3
+    Thursday  = column 4
+    Friday    = column 5
+
+    If the month starts on a Wednesday, the first Wednesday
+    appears in column 3 of the first row.
+
+    If the month starts on a weekend, the first Monday appears
+    in column 1 of the first row.
+  */
+
+  let workWeekRow = 1;
+  let hasPlacedCard = false;
+
 
   for(
     let n = 1;
     n <= count;
     n++
   ){
-
 
     const d =
       new Date(
@@ -679,24 +649,33 @@ function render(){
       );
 
 
-
-    /* HIDE WEEKENDS */
+    /* HIDE SATURDAY AND SUNDAY */
 
     if(
       d.getDay() === 0
       ||
       d.getDay() === 6
     ){
-
       continue;
-
     }
 
+
+    /*
+      Start a new row whenever we reach a Monday,
+      unless this is the first visible card of the month.
+    */
+
+    if(
+      d.getDay() === 1
+      &&
+      hasPlacedCard
+    ){
+      workWeekRow++;
+    }
 
 
     const e =
       entry(d);
-
 
 
     const card =
@@ -709,36 +688,47 @@ function render(){
       "card";
 
 
+    /*
+      Monday-Friday map directly to columns 1-5
+      because JavaScript getDay() returns:
+      Monday = 1 ... Friday = 5.
+    */
 
-    /* CHECK IF THIS CARD IS TODAY */
+    card.style.gridColumn =
+      String(d.getDay());
+
+    card.style.gridRow =
+      String(workWeekRow);
+
+
+    /*
+      Subtle alternating paper effect by work-week row.
+    */
+
+    if(workWeekRow % 3 === 0){
+      card.classList.add("alt1");
+    }
+    else if(workWeekRow % 2 === 0){
+      card.classList.add("alt2");
+    }
+
+
+    /* HIGHLIGHT TODAY */
 
     const today =
       new Date();
 
 
     if(
-
-      d.getFullYear()
-      ===
-      today.getFullYear()
-
+      d.getFullYear() === today.getFullYear()
       &&
-
-      d.getMonth()
-      ===
-      today.getMonth()
-
+      d.getMonth() === today.getMonth()
       &&
-
-      d.getDate()
-      ===
-      today.getDate()
-
+      d.getDate() === today.getDate()
     ){
 
       card.id =
         "today-card";
-
 
       card.classList.add(
         "today"
@@ -747,48 +737,35 @@ function render(){
     }
 
 
-
     card.innerHTML = `
 
       <div class="dayhead">
 
         <div class="day">
-
           ${dayNames[d.getDay()]}
-
         </div>
 
-
         <div class="date">
-
-          ${String(n).padStart(2,"0")}
-          ${monthNames[m]}
-
+          ${String(n).padStart(2,"0")} ${monthNames[m]}
         </div>
 
       </div>
 
-
       <div class="tasks"></div>
 
-
       <button class="add">
-
         + add another
-
       </button>
-
 
       <button
         class="open"
-        title="Open daily notes">
-
+        title="Open daily notes"
+        aria-label="Open daily notes"
+      >
         ↗
-
       </button>
 
     `;
-
 
 
     const tasks =
@@ -797,21 +774,16 @@ function render(){
       );
 
 
-
     e.tasks.forEach(
-
       (t,i) => {
-
 
         const row =
           document.createElement(
             "div"
           );
 
-
         row.className =
           "task";
-
 
 
         row.innerHTML = `
@@ -820,7 +792,6 @@ function render(){
             type="checkbox"
             ${e.done[i] ? "checked" : ""}
           >
-
 
           <input
             type="text"
@@ -831,14 +802,11 @@ function render(){
         `;
 
 
-
         const cb =
           row.children[0];
 
-
         const tx =
           row.children[1];
-
 
 
         cb.onchange =
@@ -852,7 +820,6 @@ function render(){
           };
 
 
-
         tx.oninput =
           () => {
 
@@ -864,16 +831,12 @@ function render(){
           };
 
 
-
         tasks.appendChild(
           row
         );
 
-
       }
-
     );
-
 
 
     card
@@ -881,13 +844,9 @@ function render(){
       .onclick =
       () => {
 
-        e.tasks.push(
-          ""
-        );
+        e.tasks.push("");
 
-        e.done.push(
-          false
-        );
+        e.done.push(false);
 
         save();
 
@@ -896,12 +855,10 @@ function render(){
       };
 
 
-
     card
       .querySelector(".open")
       .onclick =
       () => openModal(d);
-
 
 
     grid.appendChild(
@@ -909,11 +866,12 @@ function render(){
     );
 
 
+    hasPlacedCard = true;
+
   }
 
 
-
-  /* JUMP TO TODAY */
+  /* AUTOMATICALLY JUMP TO TODAY */
 
   const todayCard =
     document.getElementById(
@@ -924,32 +882,24 @@ function render(){
   if(todayCard){
 
     setTimeout(
-
       () => {
 
         todayCard.scrollIntoView({
-
           behavior:"smooth",
-
-          block:"start"
-
+          block:"start",
+          inline:"center"
         });
 
       },
-
-      100
-
+      120
     );
 
   }
 
 
-
   save();
 
-
 }
-
 
 
 /* PREVIOUS / NEXT MONTH */
@@ -958,20 +908,14 @@ function changeMonth(n){
 
   view =
     new Date(
-
       view.getFullYear(),
-
       view.getMonth() + n,
-
       1
-
     );
-
 
   render();
 
 }
-
 
 
 /* TODAY BUTTON */
@@ -984,13 +928,9 @@ function goToday(){
 
   view =
     new Date(
-
       t.getFullYear(),
-
       t.getMonth(),
-
       1
-
     );
 
 
@@ -999,11 +939,9 @@ function goToday(){
 }
 
 
-
-/* OPEN DAY NOTES */
+/* OPEN DAILY NOTES */
 
 function openModal(d){
-
 
   editingKey =
     key(d);
@@ -1013,35 +951,23 @@ function openModal(d){
     entry(d);
 
 
-
   document
     .getElementById("modalDay")
     .textContent =
-
       dayNames[d.getDay()];
-
 
 
   document
     .getElementById("modalDate")
     .textContent =
-
       d.toLocaleDateString(
-
         "en-GB",
-
         {
-
           day:"2-digit",
-
           month:"long",
-
           year:"numeric"
-
         }
-
       );
-
 
 
   const box =
@@ -1050,15 +976,11 @@ function openModal(d){
     );
 
 
-  box.innerHTML =
-    "";
-
+  box.innerHTML = "";
 
 
   e.tasks.forEach(
-
     (t,i) => {
-
 
       const row =
         document.createElement(
@@ -1074,14 +996,12 @@ function openModal(d){
         "12px";
 
 
-
       row.innerHTML = `
 
         <input
           type="checkbox"
           ${e.done[i] ? "checked" : ""}
         >
-
 
         <input
           type="text"
@@ -1090,7 +1010,6 @@ function openModal(d){
         >
 
       `;
-
 
 
       row.children[0].onchange =
@@ -1102,7 +1021,6 @@ function openModal(d){
         };
 
 
-
       row.children[1].oninput =
         () => {
 
@@ -1112,109 +1030,76 @@ function openModal(d){
         };
 
 
-
       box.appendChild(
         row
       );
 
-
     }
-
   );
-
 
 
   document
     .getElementById("modalNotes")
     .value =
-
       e.notes || "";
-
 
 
   document
     .getElementById("overlay")
     .style.display =
-
       "block";
-
 
 }
 
 
-
-/* SAVE DAY NOTES */
+/* SAVE DAILY NOTES */
 
 function saveModal(){
 
-
   data[editingKey].notes =
-
     document
       .getElementById("modalNotes")
       .value;
 
 
-
   save();
-
 
   closeModal();
 
-
   render();
-
 
 }
 
 
-
-/* CLOSE DAY NOTES */
+/* CLOSE DAILY NOTES */
 
 function closeModal(){
-
 
   document
     .getElementById("overlay")
     .style.display =
-
       "none";
 
-
 }
-
 
 
 /* EXPORT BACKUP */
 
 function exportData(){
 
-
   const blob =
     new Blob(
-
       [
-
         JSON.stringify(
-
           data,
-
           null,
-
           2
-
         )
-
       ],
-
       {
-
         type:"application/json"
-
       }
-
     );
-
 
 
   const a =
@@ -1223,68 +1108,51 @@ function exportData(){
     );
 
 
-
   a.href =
     URL.createObjectURL(
       blob
     );
 
 
-
   a.download =
     "my-diary-backup.json";
-
 
 
   a.click();
 
 
-
   setTimeout(
-
     () =>
-
       URL.revokeObjectURL(
         a.href
       ),
-
     500
-
   );
 
-
 }
-
 
 
 /* IMPORT BACKUP */
 
 function importData(ev){
 
-
   const f =
     ev.target.files[0];
 
 
   if(!f){
-
     return;
-
   }
-
 
 
   const r =
     new FileReader();
 
 
-
   r.onload =
     () => {
 
-
       try{
-
 
         const parsed =
           JSON.parse(
@@ -1292,21 +1160,13 @@ function importData(ev){
           );
 
 
-
         if(
-
           typeof parsed !== "object"
-
           ||
-
           Array.isArray(parsed)
-
         ){
-
           throw 0;
-
         }
-
 
 
         data =
@@ -1315,7 +1175,6 @@ function importData(ev){
 
         save();
 
-
         render();
 
 
@@ -1323,22 +1182,16 @@ function importData(ev){
           "Diary backup imported."
         );
 
-
       }
-
       catch(e){
-
 
         alert(
           "That file doesn't look like a valid diary backup."
         );
 
-
       }
 
-
     };
-
 
 
   r.readAsText(
@@ -1349,9 +1202,7 @@ function importData(ev){
   ev.target.value =
     "";
 
-
 }
-
 
 
 /* SERVICE WORKER */
@@ -1361,40 +1212,29 @@ if(
 ){
 
   window.addEventListener(
-
     "load",
-
     () => {
 
       navigator
         .serviceWorker
         .register(
-
           "./sw.js",
-
           {
-
             updateViaCache:"none"
-
           }
-
         );
 
     }
-
   );
 
 }
-
 
 
 /* START APP */
 
 render();
 
-
 </script>
-
 
 </body>
 </html>
