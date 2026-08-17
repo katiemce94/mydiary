@@ -232,8 +232,8 @@ button:hover{
 
 .task{
   display:flex;
-  gap:9px;
-  align-items:center;
+  gap:8px;
+  align-items:flex-start;
 }
 
 .task input[type=checkbox]{
@@ -245,6 +245,7 @@ button:hover{
   border-radius:2px;
   cursor:pointer;
   flex:none;
+  margin-top:5px;
 }
 
 .task input:checked{
@@ -261,20 +262,48 @@ button:hover{
   line-height:15px;
 }
 
-.task input:checked + input{
+.task input:checked + textarea{
   text-decoration:line-through;
   color:var(--muted);
 }
 
-.task input[type=text]{
+/* WRAPPING / AUTO-GROWING TASK TEXT */
+
+.taskText{
   border:0;
   border-bottom:1px solid #ded8cc;
   background:transparent;
   outline:0;
   width:100%;
   min-width:0;
-  padding:3px 0;
+  min-height:26px;
+  padding:3px 0 4px;
   color:var(--ink);
+  resize:none;
+  overflow:hidden;
+  line-height:1.45;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+
+/* DELETE TASK BUTTON */
+
+.deleteTask{
+  border:0;
+  background:transparent;
+  color:#b1aaa0;
+  padding:2px 0 0 4px;
+  font-size:18px;
+  line-height:1;
+  cursor:pointer;
+  flex:none;
+  opacity:.55;
+}
+
+.deleteTask:hover{
+  background:transparent;
+  color:#7f776d;
+  opacity:1;
 }
 
 .add{
@@ -532,53 +561,161 @@ const dayNames = [
 
 
 function key(d){
-
   return [
     d.getFullYear(),
     String(d.getMonth() + 1).padStart(2,"0"),
     String(d.getDate()).padStart(2,"0")
   ].join("-");
-
 }
 
 
 function save(){
-
   localStorage.setItem(
     KEY,
     JSON.stringify(data)
   );
-
 }
 
 
 function entry(d){
-
   const k = key(d);
 
   if(!data[k]){
-
     data[k] = {
       tasks:["","","","","",""],
       done:[false,false,false,false,false,false],
       notes:""
     };
+  }
 
+  /*
+    Keep old saved entries compatible if their task/done
+    array lengths are ever out of sync.
+  */
+  while(data[k].done.length < data[k].tasks.length){
+    data[k].done.push(false);
+  }
+
+  if(data[k].done.length > data[k].tasks.length){
+    data[k].done = data[k].done.slice(0, data[k].tasks.length);
   }
 
   return data[k];
-
 }
 
 
 function esc(s){
-
   return String(s)
     .replace(/&/g,"&amp;")
     .replace(/"/g,"&quot;")
     .replace(/</g,"&lt;")
     .replace(/>/g,"&gt;");
+}
 
+
+/* AUTO-GROW A TASK TEXTAREA */
+
+function autoGrow(el){
+  el.style.height = "auto";
+  el.style.height = el.scrollHeight + "px";
+}
+
+
+/* CREATE ONE TASK ROW */
+
+function createTaskRow(e, i, onDelete){
+
+  const row =
+    document.createElement("div");
+
+  row.className =
+    "task";
+
+
+  row.innerHTML = `
+    <input
+      type="checkbox"
+      ${e.done[i] ? "checked" : ""}
+      aria-label="Mark task complete"
+    >
+
+    <textarea
+      class="taskText"
+      rows="1"
+      placeholder="To do..."
+      aria-label="Task"
+    >${esc(e.tasks[i])}</textarea>
+
+    <button
+      class="deleteTask"
+      type="button"
+      title="Delete task"
+      aria-label="Delete task"
+    >×</button>
+  `;
+
+
+  const cb =
+    row.children[0];
+
+  const tx =
+    row.children[1];
+
+  const del =
+    row.children[2];
+
+
+  /*
+    Textarea content is read from textContent above.
+    Restore the exact saved value in case it contains entities.
+  */
+  tx.value =
+    e.tasks[i];
+
+
+  cb.onchange =
+    () => {
+
+      e.done[i] =
+        cb.checked;
+
+      save();
+
+    };
+
+
+  tx.oninput =
+    () => {
+
+      e.tasks[i] =
+        tx.value;
+
+      autoGrow(tx);
+
+      save();
+
+    };
+
+
+  del.onclick =
+    () => {
+
+      e.tasks.splice(i, 1);
+      e.done.splice(i, 1);
+
+      save();
+
+      onDelete();
+
+    };
+
+
+  requestAnimationFrame(
+    () => autoGrow(tx)
+  );
+
+
+  return row;
 }
 
 
@@ -614,23 +751,6 @@ function render(){
     ).getDate();
 
 
-  /*
-    Work-week row tracking.
-
-    This means:
-    Monday    = column 1
-    Tuesday   = column 2
-    Wednesday = column 3
-    Thursday  = column 4
-    Friday    = column 5
-
-    If the month starts on a Wednesday, the first Wednesday
-    appears in column 3 of the first row.
-
-    If the month starts on a weekend, the first Monday appears
-    in column 1 of the first row.
-  */
-
   let workWeekRow = 1;
   let hasPlacedCard = false;
 
@@ -661,8 +781,8 @@ function render(){
 
 
     /*
-      Start a new row whenever we reach a Monday,
-      unless this is the first visible card of the month.
+      Start a new row each Monday,
+      except for the first visible weekday of the month.
     */
 
     if(
@@ -688,11 +808,7 @@ function render(){
       "card";
 
 
-    /*
-      Monday-Friday map directly to columns 1-5
-      because JavaScript getDay() returns:
-      Monday = 1 ... Friday = 5.
-    */
+    /* Monday-Friday always map to columns 1-5 */
 
     card.style.gridColumn =
       String(d.getDay());
@@ -700,10 +816,6 @@ function render(){
     card.style.gridRow =
       String(workWeekRow);
 
-
-    /*
-      Subtle alternating paper effect by work-week row.
-    */
 
     if(workWeekRow % 3 === 0){
       card.classList.add("alt1");
@@ -774,69 +886,28 @@ function render(){
       );
 
 
-    e.tasks.forEach(
-      (t,i) => {
+    function renderCardTasks(){
 
-        const row =
-          document.createElement(
-            "div"
+      tasks.innerHTML = "";
+
+      e.tasks.forEach(
+        (t,i) => {
+
+          tasks.appendChild(
+            createTaskRow(
+              e,
+              i,
+              renderCardTasks
+            )
           );
 
-        row.className =
-          "task";
+        }
+      );
+
+    }
 
 
-        row.innerHTML = `
-
-          <input
-            type="checkbox"
-            ${e.done[i] ? "checked" : ""}
-          >
-
-          <input
-            type="text"
-            value="${esc(t)}"
-            placeholder="To do..."
-          >
-
-        `;
-
-
-        const cb =
-          row.children[0];
-
-        const tx =
-          row.children[1];
-
-
-        cb.onchange =
-          () => {
-
-            e.done[i] =
-              cb.checked;
-
-            save();
-
-          };
-
-
-        tx.oninput =
-          () => {
-
-            e.tasks[i] =
-              tx.value;
-
-            save();
-
-          };
-
-
-        tasks.appendChild(
-          row
-        );
-
-      }
-    );
+    renderCardTasks();
 
 
     card
@@ -845,12 +916,25 @@ function render(){
       () => {
 
         e.tasks.push("");
-
         e.done.push(false);
 
         save();
 
-        render();
+        renderCardTasks();
+
+        /*
+          Put focus straight into the newly added task.
+        */
+        requestAnimationFrame(
+          () => {
+            const fields =
+              tasks.querySelectorAll(".taskText");
+
+            if(fields.length){
+              fields[fields.length - 1].focus();
+            }
+          }
+        );
 
       };
 
@@ -976,66 +1060,37 @@ function openModal(d){
     );
 
 
-  box.innerHTML = "";
+  function renderModalTasks(){
+
+    box.innerHTML = "";
 
 
-  e.tasks.forEach(
-    (t,i) => {
+    e.tasks.forEach(
+      (t,i) => {
 
-      const row =
-        document.createElement(
-          "div"
+        const row =
+          createTaskRow(
+            e,
+            i,
+            renderModalTasks
+          );
+
+
+        row.style.marginBottom =
+          "12px";
+
+
+        box.appendChild(
+          row
         );
 
+      }
+    );
 
-      row.className =
-        "task";
-
-
-      row.style.marginBottom =
-        "12px";
+  }
 
 
-      row.innerHTML = `
-
-        <input
-          type="checkbox"
-          ${e.done[i] ? "checked" : ""}
-        >
-
-        <input
-          type="text"
-          value="${esc(t)}"
-          placeholder="To do..."
-        >
-
-      `;
-
-
-      row.children[0].onchange =
-        () => {
-
-          e.done[i] =
-            row.children[0].checked;
-
-        };
-
-
-      row.children[1].oninput =
-        () => {
-
-          e.tasks[i] =
-            row.children[1].value;
-
-        };
-
-
-      box.appendChild(
-        row
-      );
-
-    }
-  );
+  renderModalTasks();
 
 
   document
